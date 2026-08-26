@@ -64,6 +64,20 @@ If bonuses are included with a standard distribution, the bonus distribution mat
 
 If no standard distribution is selected, the program uses 20 tossups and, if enabled, 20 bonuses.
 
+## Existing Packet Mode
+
+Instead of generating random questions, you can choose **Select existing packet** in the first popup.
+
+This mode lets you use a specific packet that already exists in the QBReader database. After selecting this option:
+
+1. The program loads the available QBReader set list.
+2. A searchable GUI opens with the available sets.
+3. You can type into the search bar to narrow the set list.
+4. After choosing a set, you select which packet number to use.
+5. The program loads that packet directly instead of querying for random tossups and bonuses.
+
+In existing packet mode, the program skips the random-selection popups for difficulty, year range, distribution, and category selection. The tossups and bonuses come from the selected packet itself.
+
 ## Bonuses
 
 Bonuses can be included in the generated PowerPoint.
