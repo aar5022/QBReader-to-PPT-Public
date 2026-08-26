@@ -1,0 +1,1 @@
+"""QBReader to PowerPoint package."""

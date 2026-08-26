@@ -1,0 +1,36 @@
+{
+  "api": {
+    "random_tossup_url": "https://www.qbreader.org/api/random-tossup",
+    "random_bonus_url": "https://www.qbreader.org/api/random-bonus",
+    "set_list_url": "https://www.qbreader.org/api/set-list",
+    "num_packets_url": "https://www.qbreader.org/api/num-packets",
+    "packet_url": "https://www.qbreader.org/api/packet"
+  },
+  "generation": {
+    "deck_title": "Aidan R.'s QB PPT",
+    "deck_subtitle": "Generated with python-pptx",
+    "default_output_path": "output.pptx",
+    "manual_tossup_count": 20,
+    "manual_bonus_count": 20,
+    "include_bonuses_default": false,
+    "default_source_mode": "Random questions",
+    "min_year": 2000,
+    "max_year": 2026
+  },
+  "powerpoint": {
+    "effect_appear": 3844,
+    "animate_by_first_level": 1,
+    "animate_by_word": 1,
+    "question_background_color": "F7F5EF",
+    "question_text_color": "1F2933",
+    "question_font_family": "Calibri",
+    "question_max_font_size": 20,
+    "question_margin_left": 0.55,
+    "question_margin_top": 0.45,
+    "question_margin_right": 0.55,
+    "question_margin_bottom": 0.5,
+    "question_internal_margin": 0.08,
+    "question_paragraph_spacing_after": 6,
+    "question_line_spacing": 1.05
+  }
+}
