@@ -112,6 +112,21 @@ The file is saved as:
 output.pptx
 ```
 
+## Using the Slides
+
+Each tossup slide is designed to reveal gradually during play. The reader can advance through the clue text while keeping the answer available privately in the speaker notes.
+
+To advance the slide, let the animations play out to completion. You can preview the completed animation by examining the "next animation" window on the right of presenter view.
+At the end of each animation (gated by sentence or power mark), hit the right arrow key or spacebar to begin the next animation.
+
+Recommended use:
+
+1. Start the slideshow in Presenter View.
+2. Read or reveal the tossup text as normal.
+3. When a player buzzes, hit the "1" key to stop the animations and check the speaker notes for the answer.
+4. If the answer is correct, stop reading and move to the answer slide.
+5. If the answer is incorrect, continue revealing the tossup. You can resume by hitting the ` key (below Escape).
+
 ## Animation Notes
 
 Reveal animations are added through PowerPoint COM automation, so they require:
