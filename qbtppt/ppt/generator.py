@@ -78,6 +78,8 @@ def add_bonus_slides(ppt: Presentation, settings: AppSettings, bonus: BonusData,
     for part_index, part in enumerate(bonus.parts_sanitized, start=1):
         value = bonus.values[part_index - 1] if bonus.values and part_index <= len(bonus.values) else 10
         bonus_lines.append(f"[{value}] {ensure_sentence_end(part)}")
+        if part_index <= len(bonus.answers_sanitized):
+            bonus_lines.append(f"Answer: {bonus.answers_sanitized[part_index - 1]}")
 
     answer_lines = [
         f"{index + 1}. {answer}"
@@ -90,8 +92,6 @@ def add_bonus_slides(ppt: Presentation, settings: AppSettings, bonus: BonusData,
         bonus_lines,
         "Answers:\n" + "\n".join(answer_lines),
     )
-
-    add_answer_slide(ppt, settings, f"Bonus {bonus_number} Answers", "\n".join(answer_lines))
 
 
 def style_textbox_runs(textbox, settings: AppSettings, max_font_size: int) -> None:
