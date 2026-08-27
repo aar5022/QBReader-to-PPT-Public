@@ -6,7 +6,7 @@ from pptx.util import Inches, Pt
 from win32com.client import Dispatch
 
 from qbtppt.models import AppSettings, BonusData, SelectionOptions, TossupData
-from qbtppt.text.processing import after_substring, ensure_sentence_end, split_tossup
+from qbtppt.text.processing import after_substring, ensure_sentence_end, split_tossup, strip_answer_guidance
 from qbtppt.trivia.categories import category_value
 from qbtppt.trivia.difficulties import DIFFICULTY_LABELS
 from qbtppt.trivia.distributions import NO_DISTRIBUTION, PACKET_SOURCE_MODE
@@ -79,7 +79,7 @@ def add_bonus_slides(ppt: Presentation, settings: AppSettings, bonus: BonusData,
         value = bonus.values[part_index - 1] if bonus.values and part_index <= len(bonus.values) else 10
         bonus_lines.append(f"[{value}] {ensure_sentence_end(part)}")
         if part_index <= len(bonus.answers_sanitized):
-            bonus_lines.append(f"Answer: {bonus.answers_sanitized[part_index - 1]}")
+            bonus_lines.append(f"Answer: {strip_answer_guidance(bonus.answers_sanitized[part_index - 1])}")
 
     answer_lines = [
         f"{index + 1}. {answer}"

@@ -41,3 +41,8 @@ def ensure_sentence_end(text: str) -> str:
     if text.endswith((".", "?", "!", ":", ";", "(*)")):
         return text
     return text + "."
+
+def strip_answer_guidance(answer: str) -> str:
+    visible_answer = re.sub(r"\[[^\]]*\]", "", answer) # removed bracketed section
+    visible_answer = re.sub(r"\s+", " ", visible_answer).strip(" ;,.") #remove leading and trailing punctuation
+    return visible_answer or answer.strip()
