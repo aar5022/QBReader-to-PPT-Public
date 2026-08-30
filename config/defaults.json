@@ -7,8 +7,8 @@
     "packet_url": "https://www.qbreader.org/api/packet"
   },
   "generation": {
-    "deck_title": "Aidan R.'s QB PPT",
-    "deck_subtitle": "Generated with python-pptx",
+    "deck_title": "The Unofficial RIT Quiz Bowl Slides Generator",
+    "deck_subtitle": "by Aidan Roullet",
     "default_output_path": "output.pptx",
     "manual_tossup_count": 20,
     "manual_bonus_count": 20,
