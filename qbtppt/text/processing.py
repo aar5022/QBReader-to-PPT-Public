@@ -38,9 +38,49 @@ def after_substring(text: str, sub: str) -> str:
 
 
 def ensure_sentence_end(text: str) -> str:
+    if text == "NOTE":
+        return text
     if text.endswith((".", "?", "!", ":", ";", "(*)")):
         return text
     return text + "."
+
+def strip_inline_markup(text: str) -> str:
+    return (
+        re.sub(r"</?(?:b|i|u)>", "", text)
+        .replace("**", "")
+        .replace("__", "")
+        .replace("*", "")
+        .replace("_", "")
+        .strip()
+    )
+
+def replace_leading_note_with_marker(text: str) -> tuple[str, str | None]:
+    stripped_text = strip_inline_markup(text)
+
+    bracketed_note = re.match(r"^\[([^\]]*\bnote\b[^\]]*)\]\s*(.*)$", stripped_text, re.IGNORECASE)
+    if bracketed_note:
+        note = f"[{bracketed_note.group(1).strip()}]"
+        rest = bracketed_note.group(2).strip()
+        return ("NOTE" if not rest else f"NOTE {rest}", note)
+
+    colon_index = stripped_text.find(":")
+    if colon_index == -1:
+        return text, None
+
+    note_label = stripped_text[:colon_index]
+    if colon_index > 80 or not re.search(r"\bnote\b", note_label, re.IGNORECASE):
+        return text, None
+
+    sentence_end = re.search(r"[.!?](?=\s|$)", stripped_text[colon_index + 1:])
+    if sentence_end:
+        note_end = colon_index + 1 + sentence_end.end()
+        note = stripped_text[:note_end].strip()
+        rest = stripped_text[note_end:].strip()
+    else:
+        note = stripped_text.strip()
+        rest = ""
+
+    return ("NOTE" if not rest else f"NOTE {rest}", note)
 
 def strip_answer_guidance(answer: str) -> str:
     visible_answer = re.sub(r"\[[^\]]*\]", "", answer) # removed bracketed section
