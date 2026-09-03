@@ -6,10 +6,12 @@ from pptx.util import Inches, Pt
 from win32com.client import Dispatch
 
 from qbtppt.models import AppSettings, BonusData, SelectionOptions, TossupData
-from qbtppt.text.processing import after_substring, ensure_sentence_end, split_tossup, strip_answer_guidance
+from qbtppt.text.processing import ensure_sentence_end, replace_leading_note_with_marker, split_tossup, strip_answer_guidance
 from qbtppt.trivia.categories import category_value
 from qbtppt.trivia.difficulties import DIFFICULTY_LABELS
 from qbtppt.trivia.distributions import NO_DISTRIBUTION, PACKET_SOURCE_MODE
+
+PP_ANIMATE_BY_PARAGRAPH = 0
 
 
 def format_categories(categories: list[object]) -> str:
@@ -73,11 +75,26 @@ def add_styled_question_slide(ppt: Presentation, settings: AppSettings, shape_na
     text_frame.fit_text(max_size=settings.question_max_font_size, font_family=settings.question_font_family)
 
 
+def note_section(notes: list[str]) -> str:
+    if not notes:
+        return ""
+    return "\n".join(notes)
+
+
+def speaker_notes(*sections: str) -> str:
+    return "\n\n".join(section for section in sections if section)
+
+
 def add_bonus_slides(ppt: Presentation, settings: AppSettings, bonus: BonusData, bonus_number: int) -> None:
-    bonus_lines = [f"Bonus {bonus_number}", "", bonus.leadin_sanitized]
+    visible_leadin, leadin_note = replace_leading_note_with_marker(bonus.leadin_sanitized)
+    moderator_notes = [leadin_note] if leadin_note else []
+    bonus_lines = [f"Bonus {bonus_number}", "", visible_leadin]
     for part_index, part in enumerate(bonus.parts_sanitized, start=1):
         value = bonus.values[part_index - 1] if bonus.values and part_index <= len(bonus.values) else 10
-        bonus_lines.append(f"[{value}] {ensure_sentence_end(part)}")
+        visible_part, moderator_note = replace_leading_note_with_marker(part)
+        if moderator_note:
+            moderator_notes.append(moderator_note)
+        bonus_lines.append(f"[{value}] {ensure_sentence_end(visible_part)}")
         if part_index <= len(bonus.answers_sanitized):
             bonus_lines.append(f"Answer: {strip_answer_guidance(bonus.answers_sanitized[part_index - 1])}")
 
@@ -90,7 +107,7 @@ def add_bonus_slides(ppt: Presentation, settings: AppSettings, bonus: BonusData,
         settings,
         f"RevealText_Bonus_{bonus_number}",
         bonus_lines,
-        "Answers:\n" + "\n".join(answer_lines),
+        speaker_notes(note_section(moderator_notes), "Answers:\n" + "\n".join(answer_lines)),
     )
 
 
@@ -176,8 +193,10 @@ def add_reveal_animations(pptx_path: str, settings: AppSettings) -> None:
                 animation_settings = shape.AnimationSettings
                 animation_settings.Animate = True
                 animation_settings.TextLevelEffect = settings.animate_by_first_level
-                animation_settings.TextUnitEffect = settings.animate_by_word
                 animation_settings.EntryEffect = settings.effect_appear
+                if shape.Name.startswith("RevealText_Bonus"):
+                    animation_settings.TextUnitEffect = PP_ANIMATE_BY_PARAGRAPH
+                else: animation_settings.TextUnitEffect = settings.animate_by_word
         presentation.Save()
     finally:
         presentation.Close()
@@ -217,25 +236,25 @@ def build_powerpoint(
     text_frame.fit_text(max_size=15, font_family=settings.question_font_family)
 
     for q, tossup_parts in enumerate(questions):
-        note = ""
         subtitle = ""
         if "[" in answers[q] and "]" in answers[q]:
             subtitle = answers[q][answers[q].find("["):answers[q].find("]") + 1]
             answers[q] = answers[q][:answers[q].find("[")]
-        if tossup_parts and tossup_parts[0].startswith("[Note"):
-            note_end = tossup_parts[0].find("]")
-            note = tossup_parts[0][:note_end + 1]
-            tossup_parts[0] = after_substring(tossup_parts[0], "]")
+        moderator_notes = []
+        visible_tossup_parts = []
+        for tossup_part in tossup_parts:
+            visible_part, moderator_note = replace_leading_note_with_marker(tossup_part)
+            visible_tossup_parts.append(ensure_sentence_end(visible_part))
+            if moderator_note:
+                moderator_notes.append(moderator_note)
 
-        if note:
-            notes = note + f"\n Answer: {answers[q]}\n{subtitle}"
-        else:
-            notes = f"Answer: {answers[q]}\n{subtitle}"
+        answer_notes = f"Answer: {answers[q]}" + (f"\n{subtitle}" if subtitle else "")
+        notes = speaker_notes(note_section(moderator_notes), answer_notes)
         add_styled_question_slide(
             ppt,
             settings,
             f"RevealText_Tossup_{q + 1}",
-            [ensure_sentence_end(tossup_part) for tossup_part in tossup_parts],
+            visible_tossup_parts,
             notes,
         )
 
